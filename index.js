@@ -28,7 +28,11 @@ app.get("/joyas/categoria/:categoria", (req, res) => {
     const selectCategory = findCategory(categoria);
 
     if (selectCategory.length === 0)
-        return res.status(404).json({ ok: false, msg: "categoria no encontrada" });
+        return res.status(404).json({
+            ok: false,
+            error: "404 Not found",
+            msg: "categoria no encontrada",
+        });
 
     res.json(findCategory(categoria));
 });
@@ -45,6 +49,19 @@ const joya = (id) => {
 };
 
 app.get("/joyas/:id", (req, res) => {
+    const { id } = req.params;
+
+    if (!joya(id))
+        return res.status(404).json({
+            ok: false,
+            error: "404 Not found",
+            msg: "Joya no encontrada",
+        });
+
+    return res.send(joya(id));
+});
+
+app.get("/joyas/cat/:id", (req, res) => {
     const { id } = req.params;
     const { fields } = req.query;
 
