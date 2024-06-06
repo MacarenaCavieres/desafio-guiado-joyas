@@ -78,5 +78,26 @@ app.get("/joyas/cat/:id", (req, res) => {
     }
 });
 
+const orderValues = (order) => {
+    return order === "asc"
+        ? joyas.sort((a, b) => a.value - b.value)
+        : order === "desc"
+        ? joyas.sort((a, b) => b.value - a.value)
+        : false;
+};
+
+app.get("/api/v1/joyas", (req, res) => {
+    const { values } = req.params;
+
+    if (values === "asc") return res.send(orderValues("asc"));
+    if (values === "desc") return res.send(orderValues("desc"));
+
+    const { page } = req.query;
+
+    return res.send({
+        joyas: hateoas(joyas).slice(page * 3 - 3, page * 3),
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`http://localhost:${PORT}`));
