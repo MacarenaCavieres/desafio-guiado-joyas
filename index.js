@@ -27,9 +27,38 @@ app.get("/joyas/categoria/:categoria", (req, res) => {
 
     const selectCategory = findCategory(categoria);
 
-    if (selectCategory.length === 0) return res.json({ ok: false, msg: "categoria no encontrada" });
+    if (selectCategory.length === 0)
+        return res.status(404).json({ ok: false, msg: "categoria no encontrada" });
 
     res.json(findCategory(categoria));
+});
+
+const filterCategory = (joya, fields) => {
+    for (let prop in joya) {
+        if (!fields.includes(prop)) delete joya[prop];
+    }
+    return joya;
+};
+
+const joya = (id) => {
+    return joyas.find((item) => item.id === +id);
+};
+
+app.get("/joyas/:id", (req, res) => {
+    const { id } = req.params;
+    const { fields } = req.query;
+
+    if (fields) {
+        return res.send({
+            joya: filterCategory(joya(id), fields.split(",")),
+        });
+    } else {
+        return res.status(404).json({
+            ok: false,
+            error: "404 Not found",
+            msg: "Joya no encontrada",
+        });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
